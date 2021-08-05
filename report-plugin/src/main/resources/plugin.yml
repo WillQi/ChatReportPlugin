@@ -1,0 +1,19 @@
+name: ChatReportPlugin
+description: Simple chat report system that uses a web interface for moderators to issue chat punishments to players.
+main: io.github.willqi.chatreport.plugin.ChatReportPlugin
+version: 1.0.0
+author: William Qi
+
+commands:
+  chatreport:
+    description: Report another player for abusive chat behaviour!
+    permission: io.github.willqi.chatreport.permissions.game.commands.report
+    usage: /chatreport <player name>
+
+permissions:
+  io.github.willqi.chatreport.permissions.game.commands.report:
+    default: true
+    description: Allows access to the /chatreport command
+  io.github.willqi.chatreport.permissions.website.handle:
+    default: op
+    description: Allows the player to handle reports on the website and authenticate in-game
