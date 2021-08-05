@@ -1,0 +1,28 @@
+{
+  "name": "chatreportplugin-website",
+  "version": "1.0.0",
+  "description": "Website component of ChatReportPlugin",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WillQi/ChatReportPlugin.git"
+  },
+  "author": "William Qi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WillQi/ChatReportPlugin/issues"
+  },
+  "homepage": "https://github.com/WillQi/ChatReportPlugin#readme",
+  "dependencies": {
+    "connect-redis": "^6.0.0",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "helmet": "^4.6.0",
+    "mysql2": "^2.3.0",
+    "redis": "^3.1.2"
+  }
+}
