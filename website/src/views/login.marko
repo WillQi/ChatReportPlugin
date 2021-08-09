@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ChatReport | Login</title>
+        <include-html("./utils/header.html") />
+    </head>
+    <body>
+        <form method="POST" action="/login">
+            <fieldset>
+                <label for="username">Username</label>
+                <input type="text" id="username" />
+
+                <label for="password">Password</label>
+                <input type="text" id="password" />
+
+                <input type="submit" class="button-primary" value="Login">
+
+                <input type="hidden" name="_csrf" value=input.csrfToken>
+            </fieldset>
+        </form>
+    </body>
+</html>>

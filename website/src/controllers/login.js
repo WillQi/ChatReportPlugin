@@ -3,10 +3,14 @@ const csrf = require('../utility/csrf');
 
 const router = new Router();
 
+// login point
 router.get('/login', csrf, function (request, response) {
-    // Display login page
+    response.marko(require('../views/login').default, {
+        csrfToken: request.csrfToken()
+    });
 });
 
+// validate login
 router.post('/login', csrf, function (request, response) {
     // Validate login
     // Redirect to dashboard

@@ -1,17 +1,21 @@
+require('dotenv').config();
+require('@marko/compiler/register');
 const express = require('express');
 
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const formParser = require('body-parser').urlencoded({ extended: false });
 
 const marko = require('@marko/express').default;
 
 const app = express();
-const port = process.env.PORT || 8000;
+const port = process.env.WEBSITE_PORT || 8000;
 
 // middleware
 app.use(helmet());
-app.use(cookieParser());
 app.use(marko());
+app.use(cookieParser());
+app.use(formParser);
 
 // controllers
 app.use(require('./controllers/login'));
