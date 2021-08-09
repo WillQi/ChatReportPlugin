@@ -1,4 +1,4 @@
-const sql = require('mysql2');
+const sql = require('mysql2/promise');
 const redis = require('redis');
 
 const { 
@@ -26,6 +26,7 @@ const redisConnection = redis.createClient({
     host: REDIS_HOST,
     port: REDIS_PORT
 });
+
 redisConnection.sendCommand('AUTH', [REDIS_PASSWORD, REDIS_USERNAME]);  // This is purposely reversed as the library
                                                                         // appears to have reversed the arguments
 
