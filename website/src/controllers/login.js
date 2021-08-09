@@ -1,6 +1,9 @@
 const { Router } = require('express');
 const csrf = require('../utility/csrf');
 
+const userModel = require('../models/users');
+const usersModel = require('../models/users');
+
 const router = new Router();
 
 // login point
@@ -11,7 +14,11 @@ router.get('/login', csrf, function (request, response) {
 });
 
 // validate login
-router.post('/login', csrf, function (request, response) {
+router.post('/login', csrf, async function (request, response) {
+    const { username, password } = request.body;
+    const valid = await userModel.checkLogin(username, password);
+    response.send('was valid? ' + valid);
+    
     // Validate login
     // Redirect to dashboard
 });
