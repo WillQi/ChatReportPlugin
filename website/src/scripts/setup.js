@@ -5,8 +5,7 @@ const { sqlConnection } = require('../utility/database');
 // who can access the site
 const CREATE_USERS_TABLE = `CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL AUTO_INCREMENT,
-    uuid VARCHAR(36) NOT NULL,
-    username VARCHAR(16) NOT NULL,
+    username VARCHAR(16) NOT NULL UNIQUE,
     password CHAR(60) NOT NULL,
     is_admin BOOL NOT NULL,
     PRIMARY KEY(id)
@@ -36,7 +35,7 @@ const CREATE_LOG_TABLE = `CREATE TABLE IF NOT EXISTS chat_logs (
 
 const CREATE_PUNISHMENTS_TABLE = `CREATE TABLE IF NOT EXISTS punishments (
     id INT NOT NULL AUTO_INCREMENT,
-    report_id INT NOT NULL,
+    report_id INT NOT NULL UNIQUE,
     type TINYINT NOT NULL,
     assigned_at TIMESTAMP NOT NULL,
     expires_at TIMESTAMP NOT NULL,
