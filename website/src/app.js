@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const formParser = require('body-parser').urlencoded({ extended: false });
 const redisSession = require('./middleware/redisSession');
+const { valid } = require('./middleware/session');
 
 const marko = require('@marko/express').default;
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use(formParser);
 app.use(marko());
 app.use(redisSession);
+app.use(valid);
 
 // controllers
 app.use(require('./controllers/login'));

@@ -2,12 +2,9 @@ const { Router } = require('express');
 const csrf = require('../middleware/csrf');
 
 const userModel = require('../models/users');
-const registrationModel = require('../models/registration');
 
 
 const loginView = require('../views/login').default;
-const registerView = require('../views/register').default;
-const registerSuccessView = require('../views/registerSuccess').default;
 
 const router = new Router();
 
@@ -43,53 +40,6 @@ router.post('/login', csrf, async function (request, response) {
             });
         }
 
-    } catch (error) {
-        console.error(error);
-        response.sendStatus(500);
-    }
-});
-
-router.get('/register', csrf, function(request, response) {
-    response.marko(registerView, {
-        csrfToken: request.csrfToken()
-    });
-});
-
-router.post('/register', csrf, async function(request, response) {
-    if (!(request.body.username && request.body.password && request.body['confirm-password'])) {
-        response.marko(registerView, {
-            csrfToken: request.csrfToken(),
-            error: 'Missing fields'
-        });
-        return;
-    }
-
-    const { username, password, 'confirm-password': confirmPassword } = request.body;
-
-    if (password !== confirmPassword) {
-        response.marko(registerView, {
-            csrfToken: request.csrfToken(),
-            error: 'Passwords do not match'
-        });
-        return;
-    }
-    
-    // Check if existing user exists
-    try {
-        const user = await userModel.getUserByUsername(username);
-        if (user !== null) {
-            response.marko(registerView, {
-                csrfToken: request.csrfToken(),
-                error: 'Existing account'
-            });
-            return;
-        }
-    
-        // Generate code for player to run in-game
-        const code = await registrationModel.createRegistrationCode(username, password);
-        response.marko(registerSuccessView, {
-            code
-        });
     } catch (error) {
         console.error(error);
         response.sendStatus(500);

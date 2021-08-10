@@ -24,6 +24,7 @@ class UsersModel {
     }
 
     async createUser(username, hash, isAdmin = false) {
+        console.log(username, hash, isAdmin);
         await sqlConnection.execute(CREATE_USER_STMT, [username, hash, isAdmin]);
     }
 
