@@ -32,6 +32,7 @@ router.post('/login', csrf, async function (request, response) {
         const valid = await userModel.checkLogin(username, password);
 
         if (valid) {
+            request.session.username = username;
             response.redirect('/dashboard');
         } else {
             response.marko(loginView, {

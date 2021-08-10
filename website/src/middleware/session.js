@@ -1,14 +1,30 @@
+const userModel = require('../models/users');
+
 module.exports = {
-    loggedIn: function(request, response, next) {
-        if (request.session.loggedIn) {
-            next();
+    loggedIn: async function(request, response, next) {
+        if (request.session.username) {
+            let user;
+            try {
+                user = await userModel.getUserByUsername(request.session.username);
+            } catch (error) {
+                console.error(error);
+                response.sendStatus(500);
+                return;
+            }
+
+            if (user) {
+                next();
+            } else {
+                request.session.destroy();
+                response.redirect('/login');
+            }
         } else {
             response.redirect('/login');
         }
     },
     valid: function(request, response, next) {
         const { ip } = request;
-        
+
         if (!request.session.ip) {
             request.session.ip = ip;
             next();
