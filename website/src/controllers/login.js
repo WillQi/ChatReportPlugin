@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const csrf = require('../utility/csrf');
+const csrf = require('../middleware/csrf');
 
 const userModel = require('../models/users');
 const registrationModel = require('../models/registration');

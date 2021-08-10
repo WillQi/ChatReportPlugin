@@ -5,7 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const formParser = require('body-parser').urlencoded({ extended: false });
-const redisSession = require('./middleware/redis-session');
+const redisSession = require('./middleware/redisSession');
 
 const marko = require('@marko/express').default;
 
