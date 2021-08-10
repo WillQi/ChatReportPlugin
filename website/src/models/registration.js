@@ -15,7 +15,7 @@ function generateCode() {
 }
 
 class RegistrationModel {
-    
+
     async createRegistrationCode(username, password) {
         // Generate an unused code
         let code = null;
@@ -25,12 +25,13 @@ class RegistrationModel {
                 redisConnection.HSETNX(generated, 'username', username, function(err, response) {
                     if (err !== null) {
                         reject(err);
+                        return;
+                    }
+
+                    if (response === 1) {
+                        resolve(generated);
                     } else {
-                        if (response === 1) {
-                            resolve(generated);
-                        } else {
-                            resolve(null);
-                        }
+                        resolve(null);
                     }
                 });
             });
@@ -43,16 +44,17 @@ class RegistrationModel {
                 redisConnection.HSET(code, 'password', hash, function(err, _) {
                     if (err !== null) {
                         reject(err);
-                    } else {
-                        // Delete the user's registration if they're too slow in verifying
-                        redisConnection.EXPIRE(code, EXPIRY_TIME, function(err, _) {
-                            if (err !== null) {
-                                reject(err);
-                            } else {
-                                resolve(null);
-                            }
-                        });
+                        return;
                     }
+
+                    // Delete the user's registration if they're too slow in verifying
+                    redisConnection.EXPIRE(code, EXPIRY_TIME, function(err, _) {
+                        if (err !== null) {
+                            reject(err);
+                        } else {
+                            resolve(null);
+                        }
+                    });
                 });
             });
         } catch (error) {
