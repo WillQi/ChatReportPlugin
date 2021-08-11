@@ -23,8 +23,10 @@ class UsersModel {
         };
     }
 
-    async createUser(username, hash, isAdmin = false) {
-        console.log(username, hash, isAdmin);
+    async createUser(username, rawPassword, isAdmin = false) {
+        const salt = await bcrypt.genSalt(SALT_ROUNDS);
+        const hash = await bcrypt.hash(rawPassword, salt);
+
         await sqlConnection.execute(CREATE_USER_STMT, [username, hash, isAdmin]);
     }
 
@@ -38,13 +40,6 @@ class UsersModel {
 
         const validLogin = await bcrypt.compare(password, user.hash);
         return validLogin;
-    }
-
-    async generateHash(rawPassword) {
-        const salt = await bcrypt.genSalt(SALT_ROUNDS);
-        const hash = await bcrypt.hash(rawPassword, salt);
-
-        return hash;
     }
 
 }

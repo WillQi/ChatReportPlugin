@@ -1,10 +1,10 @@
 const { sqlConnection, redisConnection } = require('../utility/database');
 
 
-const CREATE_REPORT_STMT = 'INSERT INTO reports (reported_uuid, created_at) VALUES (?, ?)';
+const CREATE_REPORT_STMT = 'INSERT INTO reports (reported_uuid, created_at, resolved_at) VALUES (?, ?, NULL)';
 const GET_REPORT_STMT = 'SELECT reported_uuid, assigned_to, created_at, resolved_at FROM reports WHERE id=?';
-const GET_OPEN_REPORTS_STMT = 'SELECT id, reported_uuid, assigned_to, created_at FROM reports WHERE resolved_at=NULL ORDER BY created_at ASC LIMIT ?';
-const GET_REPORTS_ASSIGNED_TO_STMT = 'SELECT id, reported_uuid, created_at FROM reports WHERE assigned_to=? AND resolved_at=NULL ORDER BY created_at DESC';
+const GET_OPEN_REPORTS_STMT = 'SELECT id, reported_uuid, assigned_to, created_at FROM reports WHERE resolved_at IS NULL ORDER BY created_at ASC LIMIT ?';
+const GET_REPORTS_ASSIGNED_TO_STMT = 'SELECT id, reported_uuid, created_at FROM reports WHERE assigned_to=? AND resolved_at IS NULL ORDER BY created_at DESC';
 const ASSIGN_REPORT_STMT = 'UPDATE reports SET assigned_to=? WHERE id=?';
 const COMPLETE_REPORT_STMT = 'UPDATE reports SET resolved_at=? WHERE id=?';
 
@@ -96,24 +96,24 @@ class ReportModel {
     }
 
     async getOpenReports(amount = 10) {
-        const reports = (await sqlConnection.query(GET_OPEN_REPORTS_STMT, [amount]))
+        const reports = (await sqlConnection.query(GET_OPEN_REPORTS_STMT, [amount]))[0]
             .map(report => ({
                 id: report.id,
                 reportedUUID: report.reported_uuid,
-                assignedTo: data.assigned_to,
-                createdAt: data.created_at
+                assignedTo: report.assigned_to,
+                createdAt: report.created_at
             }));
 
         return reports;
     }
 
     async getReportsAssignedTo(assignedTo) {
-        const reports = (await sqlConnection.query(GET_REPORTS_ASSIGNED_TO_STMT, [userId]))
+        const reports = (await sqlConnection.query(GET_REPORTS_ASSIGNED_TO_STMT, [userId]))[0]
             .map(report => ({
                 assignedTo,
                 id: report.id,
                 reportedUUID: report.reported_uuid,
-                createdAt: data.created_at
+                createdAt: report.created_at
             }));
 
         return reports;

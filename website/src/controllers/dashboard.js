@@ -4,20 +4,22 @@ const { loggedIn } = require('../middleware/session');
 
 const reportModel = require('../models/reports');
 
+const dashboardView = require('../views/dashboard/dashboard.marko').default;
+
 const router = new Router();
 
-router.get('/dashboard', function (request, response) {
-    // TODO: validate login status  (probably create a utility function to do this)
-    // TODO: display reports
+router.get('/dashboard', loggedIn, async function (request, response) {
+    const reports = await reportModel.getOpenReports();
+    response.marko(dashboardView, {
+        reports
+    });
 });
 
 router.get('/dashboard/reports/:id', loggedIn, csrf, function (request, response) {
-    // TODO: validate login status
     // TODO: fetch report and display
 });
 
 router.post('/dashboard/reports/:id', loggedIn, csrf, function (request, response) {
-    // TODO: validate login status
     // TODO: take verdict and apply to model
 });
 
