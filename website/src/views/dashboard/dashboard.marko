@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ChatReport | Login</title>
+        <title>ChatReport | Dashboard</title>
         <include-html("../utils/header.html") />
     </head>
     <body>
@@ -18,9 +18,12 @@
                     <tr>
                         <td><a href="/dashboard/reports/" + report.id >${report.reportedUUID}</a></td>
                         <td>
-                            <if(report.assignedTo != null)>
+                            <if(report.assignedTo === input.user.id)>
                                 Assigned
                             </if>
+                            <else-if(report.assignedTo !== null)>
+                                Claimed
+                            </else-if>
                             <else>
                                 Open
                             </else>

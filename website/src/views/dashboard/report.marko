@@ -21,5 +21,35 @@
                 </for>
             </tbody>
         </table>
+
+        <form method="POST", action="/dashboard/reports/" + input.reportId>
+            <fieldset>
+                <if(input.status === 'assigned')>
+                    <label for="punishment">Punishment</label>
+                    <select name="punishment">
+                        <option>Ban</option>
+                        <option>Mute</option>
+                        <option>Reject</option>
+                    </select>
+
+                    <input type="submit" class="button-primary" value="Submit Verdict">
+                </if>
+
+                <else-if(input.status === 'claimed')>
+                    <strong>Someone else is handling this report!</strong>
+                </else-if>
+
+                <else-if(input.status === 'completed')>
+                    <strong>This report is completed.</strong>
+                </else-if>
+
+                <else>
+                    <input class="button-primary" type="submit" value="Handle Report">
+                </else>
+
+                <input type="hidden" name="_csrf" value=input.csrfToken>
+            </fieldset>
+        </form>
+
     </body>
 </html>
