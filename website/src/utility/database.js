@@ -22,16 +22,28 @@ const sqlConnection = sql.createPool({
     database: DATABASE_DATABASE
 });
 
-const redisConnection = redis.createClient({
+const redisClient = redis.createClient({
     host: REDIS_HOST,
     port: REDIS_PORT
 });
 
-redisConnection.sendCommand('AUTH', [REDIS_PASSWORD, REDIS_USERNAME]);  // This is purposely reversed as the library
-                                                                        // appears to have reversed the arguments
+redisClient.sendCommand('AUTH', [REDIS_PASSWORD, REDIS_USERNAME]);  // This is purposely reversed as the library
+                                                                    // appears to have reversed the arguments
 
+function redisConnection(methodName, ...args) {
+    return new Promise(function(resolve, reject) {
+        redisClient[methodName](...args, function(error, response) {
+            if (error !== null) {
+                reject(error);
+            } else {
+                resolve(response);
+            }
+        });
+    });
+}
 
 module.exports = {
     sqlConnection,
-    redisConnection
+    redisConnection,
+    redisClient
  };

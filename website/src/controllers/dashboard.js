@@ -2,9 +2,11 @@ const { Router } = require('express');
 const csrf = require('../middleware/csrf');
 const { loggedIn } = require('../middleware/session');
 
+const reportModel = require('../models/reports');
+
 const router = new Router();
 
-router.get('/dashboard', loggedIn, function (request, response) {
+router.get('/dashboard', function (request, response) {
     // TODO: validate login status  (probably create a utility function to do this)
     // TODO: display reports
 });
