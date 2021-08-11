@@ -13,6 +13,7 @@ module.exports = {
             }
 
             if (user) {
+                request.user = user;
                 next();
             } else {
                 request.session.destroy();
