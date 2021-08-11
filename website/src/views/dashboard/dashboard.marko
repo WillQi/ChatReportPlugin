@@ -16,7 +16,7 @@
             <tbody>
                 <for|report| of=input.reports>
                     <tr>
-                        <td>${report.reportedUUID}</td>
+                        <td><a href="/dashboard/reports/" + report.id >${report.reportedUUID}</a></td>
                         <td>
                             <if(report.assignedTo != null)>
                                 Assigned
@@ -31,4 +31,4 @@
             </tbody>
         </table>
     </body>
-</html>>
+</html>

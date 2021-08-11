@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ChatReport | View Report</title>
+        <include-html("../utils/header.html") />
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <for|message| of=input.chatLog>
+                    <tr>
+                        <td>${message.username}</td>
+                        <td>${message.message}</td>
+                    </tr>
+                </for>
+            </tbody>
+        </table>
+    </body>
+</html>
