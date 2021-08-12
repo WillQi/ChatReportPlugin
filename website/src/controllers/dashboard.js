@@ -94,7 +94,6 @@ router.post('/dashboard/reports/:id', loggedIn, csrf, async function (request, r
         const status = getReportStatus(request.user, report);
         switch (status) {
             case 'assigned':
-                // TODO: check punishment type and dish it out
                 if (report.assignedTo === request.user.id) {
                     const punishment = request.body.punishment;
                     switch (punishment) {
