@@ -1,0 +1,4 @@
+# Base link to the website component of ChatReport
+website-base-url: 0.0.0.0:8000
+# Shared secret between your website and this plugin
+website-secret: secret

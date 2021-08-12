@@ -5,6 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const formParser = require('body-parser').urlencoded({ extended: false });
+const jsonParser = require('body-parser').json();
 const redisSession = require('./middleware/redisSession');
 const { valid } = require('./middleware/session');
 
@@ -16,6 +17,7 @@ const port = process.env.WEBSITE_PORT || 8000;
 // middleware
 app.use(helmet());
 app.use(cookieParser());
+app.use(jsonParser);
 app.use(formParser);
 app.use(marko());
 app.use(redisSession);

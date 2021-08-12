@@ -85,17 +85,18 @@ router.post('/dashboard/reports/:id', loggedIn, csrf, async function (request, r
             return;
         }
 
-        const length = parseInt(request.body.length);
-        if (isNaN(length) || !isFinite(length)) {
-            response.redirect('/dashboard');
-            return;
-        }
-
         const status = getReportStatus(request.user, report);
         switch (status) {
             case 'assigned':
                 if (report.assignedTo === request.user.id) {
                     const punishment = request.body.punishment;
+
+                    const length = parseInt(request.body.length);
+                    if (isNaN(length) || !isFinite(length)) {
+                        response.redirect('/dashboard');
+                        return;
+                    }
+
                     switch (punishment) {
                         case 'ban':
                             await reportModel.completeReport(reportId, 'ban', length); 

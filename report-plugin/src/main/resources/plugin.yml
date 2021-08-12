@@ -14,6 +14,3 @@ permissions:
   io.github.willqi.chatreport.permissions.game.commands.report:
     default: true
     description: Allows access to the /chatreport command
-  io.github.willqi.chatreport.permissions.website.handle:
-    default: op
-    description: Allows the player to handle reports on the website and authenticate in-game

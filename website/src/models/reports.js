@@ -23,7 +23,6 @@ class ReportModel {
     async createReport(reportedUUID, messages) {
         const connection = await sqlConnection.getConnection();
         await connection.beginTransaction();
-
         try {
             await connection.execute(CREATE_REPORT_STMT, [reportedUUID, new Date()]);
             const [[{id}]] = await connection.query('SELECT LAST_INSERT_ID() AS id');

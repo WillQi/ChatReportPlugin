@@ -27,6 +27,17 @@
             <version>3.6.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -46,6 +57,10 @@
                                 <relocation>
                                     <pattern>redis.clients</pattern>
                                     <shadedPattern>io.github.willqi.chatreport.plugin.libraries.redis</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.squareup.retrofit2</pattern>
+                                    <shadedPattern>io.github.willqi.chatreport.plugin.libraries.com.squareup.retrofit2</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
