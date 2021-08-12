@@ -38,7 +38,7 @@ const CREATE_PUNISHMENTS_TABLE = `CREATE TABLE IF NOT EXISTS punishments (
     report_id INT NOT NULL UNIQUE,
     type TINYINT NOT NULL,
     assigned_at TIMESTAMP NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NULL,
     FOREIGN KEY(report_id) REFERENCES reports(id),
     PRIMARY KEY(id) 
 );`;

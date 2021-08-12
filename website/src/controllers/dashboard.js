@@ -85,6 +85,12 @@ router.post('/dashboard/reports/:id', loggedIn, csrf, async function (request, r
             return;
         }
 
+        const length = parseInt(request.body.length);
+        if (isNaN(length) || !isFinite(length)) {
+            response.redirect('/dashboard');
+            return;
+        }
+
         const status = getReportStatus(request.user, report);
         switch (status) {
             case 'assigned':
@@ -92,14 +98,16 @@ router.post('/dashboard/reports/:id', loggedIn, csrf, async function (request, r
                 if (report.assignedTo === request.user.id) {
                     const punishment = request.body.punishment;
                     switch (punishment) {
-                        case 'Ban':
-
+                        case 'ban':
+                            await reportModel.completeReport(reportId, 'ban', length); 
                         break;
-                        case 'Mute':
-
+                        case 'mute':
+                            await reportModel.completeReport(reportId, 'mute', length); 
+                        break;
+                        default:
+                            await reportModel.completeReport(reportId, 'reject'); 
                         break;
                     }
-                    await reportModel.completeReport(reportId);
                 }
             break;
             case 'unclaimed':

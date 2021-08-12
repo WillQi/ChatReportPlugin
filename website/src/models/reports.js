@@ -11,15 +11,23 @@ const COMPLETE_REPORT_STMT = 'UPDATE reports SET resolved_at=? WHERE id=?';
 const ADD_CHAT_LOG_STMT = 'INSERT INTO chat_logs (report_id, uuid, username, message) VALUES (?, ?, ?, ?)';
 const GET_CHAT_LOGS = 'SELECT id, uuid, username, message FROM chat_logs WHERE report_id=? ORDER BY id ASC';
 
+const ADD_PUNISHMENT_STMT = 'INSERT INTO punishments (report_id, type, assigned_at, expires_at) VALUES (?, ?, ?, ?)';
+
 class ReportModel {
 
+    /**
+     * Create a report on a player
+     * @param {string} reportedUUID reported players uuid
+     * @param {{ uuid : string, username : string, message : string }[]} messages chat messages to store
+     */
     async createReport(reportedUUID, messages) {
         const connection = await sqlConnection.getConnection();
         await connection.beginTransaction();
-        await connection.execute(CREATE_REPORT_STMT, [reportedUUID, new Date()]);
-        const [[{id}]] = await connection.query('SELECT LAST_INSERT_ID() AS id');
 
         try {
+            await connection.execute(CREATE_REPORT_STMT, [reportedUUID, new Date()]);
+            const [[{id}]] = await connection.query('SELECT LAST_INSERT_ID() AS id');
+
             for (const { uuid, username, message } of messages) {
                 await connection.execute(ADD_CHAT_LOG_STMT, [id, uuid, username, message]);
             }
@@ -28,10 +36,16 @@ class ReportModel {
         } catch (error) {
             await connection.rollback();
             throw error;
+        } finally {
+            await connection.release();
         }
-        connection.release();
     }
 
+    /**
+     * Get a specific report by its id
+     * @param {number} id 
+     * @returns the report
+     */
     async getReport(id) {
         const [[data]] = await sqlConnection.query(GET_REPORT_STMT, [id]);
 
@@ -44,6 +58,13 @@ class ReportModel {
         };
     }
 
+    /**
+     * Get the chat log associated with a report
+     * Will attempt to fetch it from redis if cached
+     * Otherwise it will fetch from the database and cache it to redis
+     * @param {number} id report id 
+     * @returns chat log
+     */
     async getReportChatLog(id) {
         const key = `chatlog:${id}`;
         const exists = await redisConnection('EXISTS', key);
@@ -76,6 +97,7 @@ class ReportModel {
             if (gotLock) {
                 // add messages to redis cache
                 try {
+                    // add all chat keys to an array that links to the chat message
                     for (const { id, uuid, username, message } of messages) {
                         const messageKey = `${key}:${id}`;
                         await redisConnection('HSET', messageKey, 'id', id, 'uuid', uuid, 'username', username, 'message', message);
@@ -85,16 +107,22 @@ class ReportModel {
                     }
                     await redisConnection('EXPIRE', key, 60 * 30);
                 } catch (error) {
-                    await redisConnection('DEL', key, `${key}:lock`, ...messages.map(message => `${key}:${message.id}`));
+                    await redisConnection('DEL', key, ...messages.map(message => `${key}:${message.id}`));
                     throw error;
+                } finally {
+                    await redisConnection('DEL', `${key}:lock`);
                 }
-                await redisConnection('DEL', `${key}:lock`);
             }
         }
 
         return messages;
     }
 
+    /**
+     * Get reports that have not been resolved sorted by when they were submitted in ascending order
+     * @param {number} amount amount of reports to fetch
+     * @returns open reports
+     */
     async getOpenReports(amount = 10) {
         const reports = (await sqlConnection.query(GET_OPEN_REPORTS_STMT, [amount]))[0]
             .map(report => ({
@@ -107,6 +135,11 @@ class ReportModel {
         return reports;
     }
 
+    /**
+     * Get all reports that are assigned to a user
+     * @param {number} assignedTo user id
+     * @returns reports assigned
+     */
     async getReportsAssignedTo(assignedTo) {
         const reports = (await sqlConnection.query(GET_REPORTS_ASSIGNED_TO_STMT, [userId]))[0]
             .map(report => ({
@@ -119,12 +152,39 @@ class ReportModel {
         return reports;
     }
 
+    /**
+     * Assign a report to a user
+     * @param {number} reportId id of the report
+     * @param {number} userId id of the user we are assigning the report to
+     */
     async assignReport(reportId, userId) {
         await sqlConnection.execute(ASSIGN_REPORT_STMT, [userId, reportId]);
     }
 
-    async completeReport(id) {
-        await sqlConnection.execute(COMPLETE_REPORT_STMT, [new Date(), id]);
+    /**
+     * Complete a report
+     * @param {number} id id of the report
+     * @param {'reject'|'ban'|'mute'} action report action
+     * @param {number} [length] amount of ms the punishment lasts 
+     */
+    async completeReport(id, action, length) {
+        const connection = await sqlConnection.getConnection();
+        await connection.beginTransaction();
+        try {
+            await connection.execute(COMPLETE_REPORT_STMT, [new Date(), id]);
+
+            // Only add a punishment entry if we aren't rejecting the report
+            if (action !== 'reject') {
+                const isBan = action === 'ban';
+                await connection.execute(ADD_PUNISHMENT_STMT, [id, (isBan ? 1 : 0), new Date(), new Date(Date.now() + length)]);
+            }
+            await connection.commit();
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            await connection.release();
+        }
     }
 
 }
