@@ -30,7 +30,7 @@ class PunishmentModel {
                         id: parseInt(id),
                         reportId: parseInt(reportId),
                         type: parseInt(type),
-                        timeLeft: expiresAt ? new Date(parseInt(expiresAt)).getTime() - new Date(parseInt(assignedAt)).getTime() : null
+                        timeLeft: expiresAt ? new Date(parseInt(expiresAt)).getTime() - Date.now() : null
                     });
                 }
             }
@@ -68,7 +68,7 @@ class PunishmentModel {
                     id,
                     reportId,
                     type,
-                    timeLeft: expiresAt ? expiresAt.getTime() - assignedAt.getTime() : null
+                    timeLeft: expiresAt ? expiresAt.getTime() - Date.now() : null
                 };
             });
         }

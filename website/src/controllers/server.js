@@ -7,7 +7,7 @@ const reportModel = require('../models/reports');
 
 const router = new Router();
 
-router.get('/server/punishments/:uuid', serverSecret, async function(request, response) {
+router.post('/server/punishments/:uuid', serverSecret, async function(request, response) {
     try {
         const punishments = await punishmentModel.getActivePunishmentsByUUID(request.params.uuid);
         response.json({

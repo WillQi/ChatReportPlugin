@@ -31,7 +31,7 @@ public class WebAPI {
      * @return punishments
      * @throws IOException if a web exception occured
      */
-    public Set<Punishment> getPunishments(UUID uuid) throws IOException {
+    public PunishmentResponse getPunishments(UUID uuid) throws IOException {
         return this.reportService.getPunishments(this.secret, uuid)
                 .execute().body();
     }
