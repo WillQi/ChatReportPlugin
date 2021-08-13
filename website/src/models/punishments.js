@@ -1,6 +1,6 @@
 const { redisConnection, sqlConnection } = require('../utility/database');
 
-const GET_ACTIVE_PUNISHMENTS_STMT = 'SELECT punishments.id, punishments.report_id, punishments.type, punishments.assigned_at, punishments.expires_at FROM punishments INNER JOIN reports ON reports.id=punishments.report_id AND reports.reported_uuid=?';
+const GET_ACTIVE_PUNISHMENTS_STMT = 'SELECT punishments.id, punishments.report_id, punishments.type, punishments.assigned_at, punishments.expires_at FROM punishments INNER JOIN reports ON reports.id=punishments.report_id AND reports.reported_uuid=? AND punishments.expires_at > ?';
 
 class PunishmentModel {
 
@@ -29,7 +29,7 @@ class PunishmentModel {
                     punishments.push({
                         reportId: parseInt(reportId),
                         type: parseInt(type),
-                        timeLeft: expiresAt ? new Date(parseInt(expiresAt)).getTime() - Date.now() : null
+                        timeLeft: new Date(parseInt(expiresAt)).getTime() - Date.now()
                     });
                 }
             }
@@ -37,7 +37,7 @@ class PunishmentModel {
             return punishments;
         } else {    
             // fetch from database and add to redis
-            const [punishmentsRows] = (await sqlConnection.query(GET_ACTIVE_PUNISHMENTS_STMT, [uuid]));
+            const [punishmentsRows] = (await sqlConnection.query(GET_ACTIVE_PUNISHMENTS_STMT, [uuid, new Date()]));
 
             // try adding to redis cache
             const gotLock = await redisConnection('SETNX', `${punishmentsKey}:lock`, 1);
@@ -66,7 +66,7 @@ class PunishmentModel {
                 return {
                     reportId,
                     type,
-                    timeLeft: expiresAt ? expiresAt.getTime() - Date.now() : null
+                    timeLeft: expiresAt.getTime() - Date.now()
                 };
             });
         }
