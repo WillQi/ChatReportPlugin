@@ -13,6 +13,8 @@ const GET_CHAT_LOGS = 'SELECT id, uuid, username, message FROM chat_logs WHERE r
 
 const ADD_PUNISHMENT_STMT = 'INSERT INTO punishments (report_id, type, assigned_at, expires_at) VALUES (?, ?, ?, ?)';
 
+const REDIS_CHANNEL = 'chatreports:punishment';
+
 class ReportModel {
 
     /**
@@ -167,15 +169,20 @@ class ReportModel {
      * @param {number} [length] amount of ms the punishment lasts 
      */
     async completeReport(id, action, length) {
+        const needsPunishment = action !== 'reject';
+        const assignedAt = new Date();
+        const expiresAt = new Date(assignedAt.getTime() + length);
+
+        let punishmentId;
         const connection = await sqlConnection.getConnection();
         await connection.beginTransaction();
         try {
             await connection.execute(COMPLETE_REPORT_STMT, [new Date(), id]);
 
             // Only add a punishment entry if we aren't rejecting the report
-            if (action !== 'reject') {
-                const isBan = action === 'ban';
-                await connection.execute(ADD_PUNISHMENT_STMT, [id, (isBan ? 1 : 0), new Date(), new Date(Date.now() + length)]);
+            if (needsPunishment) {
+                await connection.execute(ADD_PUNISHMENT_STMT, [id, (action === 'ban' ? 1 : 0), assignedAt, expiresAt]);
+                punishmentId = (await connection.execute('SELECT LAST_INSERT_ID() AS id'))[0].id;
             }
             await connection.commit();
         } catch (error) {
@@ -183,6 +190,26 @@ class ReportModel {
             throw error;
         } finally {
             await connection.release();
+        }
+
+        if (needsPunishment) {
+            // Send over redis to notify listeners
+            const { reportedUUID : uuid } = await this.getReport(id);
+            await redisConnection('PUBLISH', REDIS_CHANNEL, JSON.stringify({
+                uuid,
+                reportId: id,
+                type: action === 'ban' ? 1 : 0,
+                timeLeft: length
+            }));
+
+            // Update punishment cache
+            const punishmentEntryKey = `punishment:${punishmentId}`;
+
+            const pushed = await redisConnection('LPUSHX', `punishments:${uuid}`, punishmentEntryKey);
+            if (pushed) {
+                await redisConnection('HSET', punishmentEntryKey, 'reportId', id, 'type', action === 'ban' ? 1 : 0, 'expiresAt', expiresAt, 'assignedAt', assignedAt);
+                await redisConnection('EXPIRE', punishmentEntryKey, 60000 * 30);
+            }
         }
     }
 

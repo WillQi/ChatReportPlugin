@@ -3,6 +3,7 @@ package io.github.willqi.chatreport.plugin;
 import io.github.willqi.chatreport.plugin.utils.TextUtils;
 import io.github.willqi.chatreport.plugin.webapi.data.Punishment;
 import io.github.willqi.chatreport.plugin.webapi.data.PunishmentResponse;
+import io.github.willqi.chatreport.plugin.webapi.data.RedisPunishment;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,17 +41,35 @@ public class PunishmentManager implements Listener {
         Set<Punishment> punishments = this.onlinePlayersCache.getOrDefault(uuid, null);
         if (punishments != null && !forceFetch) {
             // Expire old punishments
-            Set<Punishment> activePunishments = punishments.stream().filter(Punishment::isActive).collect(Collectors.toSet());
-            this.onlinePlayersCache.computeIfPresent(uuid, (oldKey, oldPunishments) -> activePunishments);
-            return activePunishments;
+            punishments.removeIf(punishment -> !punishment.isActive());
+            return punishments;
         }
 
         PunishmentResponse punishmentResponse = this.plugin.getWebAPI().getPunishments(uuid);
         if (punishmentResponse.getStatus() == 200) {
-            this.onlinePlayersCache.computeIfPresent(uuid, (oldKey, oldPunishments) -> new HashSet<>(punishmentResponse.getPunishments()));
-            return new HashSet<>(punishmentResponse.getPunishments());
+            this.onlinePlayersCache.computeIfPresent(uuid, (oldKey, oldPunishments) -> {
+                oldPunishments.addAll(punishmentResponse.getPunishments());
+                return oldPunishments;
+            });
+            return this.onlinePlayersCache.getOrDefault(uuid, punishmentResponse.getPunishments());
         } else {
             throw new IOException(punishmentResponse.getMessage());
+        }
+    }
+
+    /**
+     * Called when a punishment is received from redis
+     * @param punishment
+     */
+    void onReceivedPunishment(RedisPunishment punishment) {
+        Set<Punishment> punishments = this.onlinePlayersCache.getOrDefault(punishment.getUUID(), null);
+        if (punishments != null) {
+            punishments.add(punishment);
+
+            if (punishment.getType() == Punishment.Type.BAN) {
+                this.plugin.getServer().getScheduler().runTask(this.plugin, () ->
+                        this.plugin.getServer().getPlayer(punishment.getUUID()).kickPlayer("You are banned for your chat behaviour!"));
+            }
         }
     }
 
@@ -81,11 +100,11 @@ public class PunishmentManager implements Listener {
     // Handles bans
     @EventHandler
     public void onPlayerPreJoin(AsyncPlayerPreLoginEvent event)  {
-        this.onlinePlayersCache.put(event.getUniqueId(), Collections.emptySet());
+        this.onlinePlayersCache.put(event.getUniqueId(), ConcurrentHashMap.newKeySet());
         try {
             this.getPunishments(event.getUniqueId(), true);
             if (this.isBanned(event.getUniqueId())) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, "You are banned!");
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, "You are banned for your chat behaviour!");
             }
         } catch (IOException exception) {
             this.plugin.getLogger().log(Level.SEVERE, "An exception occurred while checking if a player was banned", exception);

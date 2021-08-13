@@ -2,8 +2,8 @@ package io.github.willqi.chatreport.plugin.webapi.data;
 
 public class ReportResponse {
 
-    private int status;
-    private String message;
+    protected int status;
+    protected String message;
 
 
     public int getStatus() {

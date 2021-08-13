@@ -5,3 +5,9 @@ website-secret: secret
 
 # How many chat messages should be sent going back when /chatreport is used
 max-chat-log-size: 20
+
+# Redis information to subscribe to incoming punishments for online players
+redis-host: 0.0.0.0
+redis-port: 6379
+redis-username: username
+redis-password: password

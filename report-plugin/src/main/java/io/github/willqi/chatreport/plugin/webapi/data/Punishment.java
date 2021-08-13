@@ -4,22 +4,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class Punishment {
 
-    private int id;
-    private int reportId;
-    private int type;
+    protected int reportId;
+    protected int type;
 
     @SerializedName("timeLeft")
-    private long fetchedTimeLeft;
+    protected long fetchedTimeLeft;
 
     private long fetchedAt;
 
     public Punishment() {
         this.fetchedAt = System.currentTimeMillis();
-    }
-
-
-    public int getId() {
-        return this.id;
     }
 
     public int getReportId() {
@@ -36,6 +30,20 @@ public class Punishment {
 
     public boolean isActive() {
         return this.getTimeLeft() > 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return (37 * this.type) + (37 * this.reportId);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Punishment) {
+            Punishment otherPunishment = (Punishment)obj;
+            return otherPunishment.getReportId() == this.getReportId();
+        }
+        return false;
     }
 
     public enum Type {

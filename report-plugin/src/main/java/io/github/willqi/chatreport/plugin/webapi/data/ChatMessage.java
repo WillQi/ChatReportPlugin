@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public class ChatMessage {
 
-    private final UUID uuid;
-    private final String username;
-    private final String message;
+    protected final UUID uuid;
+    protected final String username;
+    protected final String message;
 
 
     public ChatMessage(UUID uuid, String username, String message) {

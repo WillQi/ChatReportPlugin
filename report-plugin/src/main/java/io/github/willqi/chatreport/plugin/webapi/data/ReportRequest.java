@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public class ReportRequest {
 
-    private final String secret;
-    private final UUID uuid;
-    private final List<ChatMessage> chat;
+    protected final String secret;
+    protected final UUID uuid;
+    protected final List<ChatMessage> chat;
 
 
     public ReportRequest(String secret, UUID uuid, List<ChatMessage> chat) {

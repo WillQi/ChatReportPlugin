@@ -1,12 +1,12 @@
 package io.github.willqi.chatreport.plugin.webapi.data;
 
-import java.util.List;
+import java.util.Set;
 
 public class PunishmentResponse {
 
-    private int status;
-    private String message;
-    private List<Punishment> punishments;
+    protected int status;
+    protected String message;
+    protected Set<Punishment> punishments;
 
 
     public int getStatus() {
@@ -17,7 +17,7 @@ public class PunishmentResponse {
         return this.message;
     }
 
-    public List<Punishment> getPunishments() {
+    public Set<Punishment> getPunishments() {
         return this.punishments;
     }
 

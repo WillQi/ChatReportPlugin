@@ -8,6 +8,7 @@ public class ChatReportPlugin extends JavaPlugin {
 
     private WebAPI webAPI;
     private PunishmentManager punishmentManager;
+    private RedisThread redisThread;
 
 
     @Override
@@ -19,8 +20,15 @@ public class ChatReportPlugin extends JavaPlugin {
                 this.getConfig().getString("website-secret")
         );
         this.punishmentManager = new PunishmentManager(this);
+        this.redisThread = new RedisThread(this);
+        this.redisThread.start();
 
         this.getCommand("chatreport").setExecutor(new ChatReportCommand(this));
+    }
+
+    @Override
+    public void onDisable() {
+        this.redisThread.interrupt();
     }
 
     public WebAPI getWebAPI() {

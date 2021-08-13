@@ -1,4 +1,4 @@
-const { redisConnection, sqlConnection, redisClient } = require('../utility/database');
+const { redisConnection, sqlConnection } = require('../utility/database');
 
 const GET_ACTIVE_PUNISHMENTS_STMT = 'SELECT punishments.id, punishments.report_id, punishments.type, punishments.assigned_at, punishments.expires_at FROM punishments INNER JOIN reports ON reports.id=punishments.report_id AND reports.reported_uuid=?';
 
@@ -25,9 +25,8 @@ class PunishmentModel {
                     // Punishment has not expired
                     await redisConnection('EXPIRE', punishmentId, 60000 * 30);
 
-                    const { id, reportId, type, assignedAt, expiresAt } = punishmentData;
+                    const { reportId, type, expiresAt } = punishmentData;
                     punishments.push({
-                        id: parseInt(id),
                         reportId: parseInt(reportId),
                         type: parseInt(type),
                         timeLeft: expiresAt ? new Date(parseInt(expiresAt)).getTime() - Date.now() : null
@@ -47,7 +46,7 @@ class PunishmentModel {
                     // add all punishment keys to an array that links to the punishment data
                     for (const row of punishmentsRows) {
                         const entryKey = `punishment:${row.id}`;
-                        await redisConnection('HSET', entryKey, 'id', row.id, 'reportId', row.report_id, 'type', row.type, 'expiresAt', row.expires_at.getTime(), 'assignedAt', row.assigned_at.getTime());
+                        await redisConnection('HSET', entryKey, 'reportId', row.report_id, 'type', row.type, 'expiresAt', row.expires_at.getTime(), 'assignedAt', row.assigned_at.getTime());
                         await redisConnection('EXPIRE', entryKey, 60000 * 30);
                         
                         await redisConnection('LPUSH', punishmentsKey, entryKey);
@@ -63,9 +62,8 @@ class PunishmentModel {
             }
 
             punishments = punishmentsRows.map(punishment => {
-                const { id, report_id : reportId, type, assigned_at : assignedAt, expires_at : expiresAt }  = punishment;
+                const { report_id : reportId, type, expires_at : expiresAt }  = punishment;
                 return {
-                    id,
                     reportId,
                     type,
                     timeLeft: expiresAt ? expiresAt.getTime() - Date.now() : null
