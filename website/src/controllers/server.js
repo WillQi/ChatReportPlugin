@@ -25,7 +25,7 @@ router.post('/server/punishments/:uuid', serverSecret, async function(request, r
 });
 
 router.post('/server/reports', serverSecret, async function(request, response) {
-    if (!request.body.uuid || !request.body.chat) {
+    if (!request.body.uuid || !request.body.username || !request.body.chat) {
         response.json({
             status: 400,
             message: 'Missing arguments'
@@ -33,9 +33,9 @@ router.post('/server/reports', serverSecret, async function(request, response) {
         return;
     }
 
-    const { uuid, chat } = request.body;
+    const { uuid, username, chat } = request.body;
     try {
-        await reportModel.createReport(uuid, chat);
+        await reportModel.createReport(uuid, username, chat);
         response.json({
             status: 200,
             message: 'Submitted Report'

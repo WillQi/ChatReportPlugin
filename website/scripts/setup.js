@@ -15,6 +15,7 @@ const CREATE_USERS_TABLE = `CREATE TABLE IF NOT EXISTS users (
 const CREATE_REPORTS_TABLE = `CREATE TABLE IF NOT EXISTS reports (
     id INT NOT NULL AUTO_INCREMENT,
     reported_uuid VARCHAR(36) NOT NULL,
+    reported_username VARCHAR(16) NOT NULL,
     assigned_to INT NULL,
     created_at TIMESTAMP NOT NULL,
     resolved_at TIMESTAMP NULL,

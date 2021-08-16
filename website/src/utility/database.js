@@ -26,6 +26,7 @@ const redisClient = redis.createClient({
     host: REDIS_HOST,
     port: REDIS_PORT
 });
+redisClient.on('error', console.error);
 
 redisClient.sendCommand('AUTH', [REDIS_PASSWORD, REDIS_USERNAME]);  // This is purposely reversed as the library
                                                                     // appears to have reversed the arguments

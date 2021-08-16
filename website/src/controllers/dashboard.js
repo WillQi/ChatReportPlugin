@@ -31,7 +31,8 @@ router.get('/dashboard', loggedIn, async function (request, response) {
         const reports = await reportModel.getOpenReports();
         response.marko(dashboardView, {
             reports,
-            user: request.user
+            user: request.user,
+            username: request.session.username
         });
     } catch (error) {
         console.error(error);

@@ -11,7 +11,7 @@ class PunishmentModel {
         const existsInCache = await redisConnection('EXISTS', punishmentsKey);
         if (existsInCache) {    
             // fetch from redis cache
-            await redisConnection('EXPIRE', punishmentsKey, 60000 * 30);
+            await redisConnection('EXPIRE', punishmentsKey, 60 * 30);
 
             const cachedPunishments = await redisConnection('LRANGE', punishmentsKey, 0, -1);
             for (const punishmentId of cachedPunishments) {
@@ -23,7 +23,7 @@ class PunishmentModel {
                     await redisConnection('LREM', punishmentsKey, 1, punishmentId);
                 } else {    
                     // Punishment has not expired
-                    await redisConnection('EXPIRE', punishmentId, 60000 * 30);
+                    await redisConnection('EXPIRE', punishmentId, 60 * 30);
 
                     const { reportId, type, expiresAt } = punishmentData;
                     punishments.push({
@@ -47,11 +47,11 @@ class PunishmentModel {
                     for (const row of punishmentsRows) {
                         const entryKey = `punishment:${row.id}`;
                         await redisConnection('HSET', entryKey, 'reportId', row.report_id, 'type', row.type, 'expiresAt', row.expires_at.getTime(), 'assignedAt', row.assigned_at.getTime());
-                        await redisConnection('EXPIRE', entryKey, 60000 * 30);
+                        await redisConnection('EXPIRE', entryKey, 60 * 30);
                         
                         await redisConnection('LPUSH', punishmentsKey, entryKey);
                     }
-                    await redisConnection('EXPIRE', punishmentsKey, 60000 * 30);
+                    await redisConnection('EXPIRE', punishmentsKey, 60 * 30);
                 } catch (error) {
                     // Remove punishments from redis on error
                     await redisConnection('DEL', punishmentsKey, ...punishments.map(punishment => `punishment:${punishment.id}`));

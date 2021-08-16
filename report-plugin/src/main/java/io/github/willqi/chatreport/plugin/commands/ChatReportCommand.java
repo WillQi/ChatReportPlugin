@@ -56,7 +56,7 @@ public class ChatReportCommand implements CommandExecutor, Listener {
             }
 
             try {
-                ReportResponse response = this.plugin.getWebAPI().createReport(player.getUniqueId(), chatMessages);
+                ReportResponse response = this.plugin.getWebAPI().createReport(player.getUniqueId(), player.getName(), chatMessages);
                 this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
                     if (response.getStatus() == 200) {
                         commandSender.sendMessage(TextUtils.formatMessage("ChatReport", "Report sent!"));

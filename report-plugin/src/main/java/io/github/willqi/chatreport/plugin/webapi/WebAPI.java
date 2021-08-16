@@ -42,8 +42,8 @@ public class WebAPI {
      * @return {@link ReportResponse}
      * @throws IOException if a web exception occured
      */
-    public ReportResponse createReport(UUID uuid, List<ChatMessage> messages) throws IOException {
-        return this.reportService.createReport(new ReportRequest(this.secret, uuid, messages))
+    public ReportResponse createReport(UUID uuid, String username, List<ChatMessage> messages) throws IOException {
+        return this.reportService.createReport(new ReportRequest(this.secret, uuid, username, messages))
                 .execute().body();
     }
 

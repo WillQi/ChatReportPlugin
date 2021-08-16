@@ -5,33 +5,41 @@
         <include-html("../utils/header.html") />
     </head>
     <body>
-        <table>
-            <thead>
-                <tr>
-                    <th>Identification</th>
-                    <th>Status</th>
-                    <th>Opened</th>
-                </tr>
-            </thead>
-            <tbody>
-                <for|report| of=input.reports>
-                    <tr>
-                        <td><a href="/dashboard/reports/" + report.id >${report.reportedUUID}</a></td>
-                        <td>
-                            <if(report.assignedTo === input.user.id)>
-                                Assigned
-                            </if>
-                            <else-if(report.assignedTo !== null)>
-                                Claimed
-                            </else-if>
-                            <else>
-                                Open
-                            </else>
-                        </td>
-                        <td>${report.createdAt}</td>
-                    </tr>
-                </for>
-            </tbody>
-        </table>
+        <div class="columns">
+            <div class="box">
+                <h1>Dashboard</h1>
+                <label>Welcome ${input.username}!</label>
+            </div>
+            <div class="box">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reported User</th>
+                            <th>Status</th>
+                            <th>Opened</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <for|report| of=input.reports>
+                            <tr>
+                                <td><a href="/dashboard/reports/" + report.id >${report.reportedUsername}</a></td>
+                                <td>
+                                    <if(report.assignedTo === input.user.id)>
+                                        Assigned
+                                    </if>
+                                    <else-if(report.assignedTo !== null)>
+                                        Claimed
+                                    </else-if>
+                                    <else>
+                                        Open
+                                    </else>
+                                </td>
+                                <td>${report.createdAt}</td>
+                            </tr>
+                        </for>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </body>
 </html>
