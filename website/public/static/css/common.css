@@ -1,0 +1,34 @@
+html, body {
+    height: 100%;
+}
+
+.columns {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+
+.box {
+    border: 1px solid #eeeeee;
+    padding: 1em;
+    margin: 1em;
+    box-shadow: 1px 1px #b1b1b1;
+}
+
+.box.error {
+    background-color: #ee0000;
+    border: 1px solid red;
+    color: #ffffff;
+}
+
+.centered-text {
+    text-align: center;
+}
+
+input {
+    text-align: center;
+}
+
+h1 {
+    cursor: default;
+}

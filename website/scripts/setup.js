@@ -1,6 +1,6 @@
 // Setup database tables
 require('dotenv').config();
-const { sqlConnection } = require('../utility/database');
+const { sqlConnection } = require('../src/utility/database');
 
 // who can access the site
 const CREATE_USERS_TABLE = `CREATE TABLE IF NOT EXISTS users (

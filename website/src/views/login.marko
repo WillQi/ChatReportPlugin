@@ -3,20 +3,34 @@
     <head>
         <title>ChatReport | Login</title>
         <include-html("./utils/header.html") />
+        <link rel="stylesheet" href="static/css/common.css">
+        <link rel="stylesheet" href="static/css/login.css">
     </head>
     <body>
-        <form method="POST" action="/login">
-            <fieldset>
-                <label for="username">Username</label>
-                <input type="text" name="username" />
+        <div class="columns" id="loginBox">
+            <div>
+                <if(input.error != null)>
+                    <div class="box error">
+                        <label class="centered-text">${input.error}</label>
+                    </div>
+                </if>
+                <div class="box">
+                    <h1>Login</h1>
+                    <form method="POST" action="/login">
+                        <fieldset>
+                            <label for="username">Username</label>
+                            <input type="text" name="username" />
 
-                <label for="password">Password</label>
-                <input type="password" name="password" />
+                            <label for="password">Password</label>
+                            <input type="password" name="password" />
 
-                <input type="submit" class="button-primary" value="Login">
+                            <input type="submit" class="button-primary" value="Login">
 
-                <input type="hidden" name="_csrf" value=input.csrfToken>
-            </fieldset>
-        </form>
+                            <input type="hidden" name="_csrf" value=input.csrfToken>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

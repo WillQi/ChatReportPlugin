@@ -5,8 +5,8 @@
   "main": "./src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./src/app.js",
-    "setup": "node ./src/scripts/setup.js"
+    "start": "node ./app.js",
+    "setup": "node ./scripts/setup.js"
   },
   "repository": {
     "type": "git",
