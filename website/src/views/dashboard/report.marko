@@ -5,61 +5,69 @@
         <include-html("../utils/header.html") />
     </head>
     <body>
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-            <tbody>
-                <for|message| of=input.chatLog>
-                    <tr>
-                        <td>${message.username}</td>
-                        <td>${message.message}</td>
-                    </tr>
-                </for>
-            </tbody>
-        </table>
+        <div class="columns">
+            <div class="box one-third centered-text">
+                <form method="POST", action="/dashboard/reports/" + input.reportId>
+                    <fieldset>
+                        <if(input.status === 'assigned')>
+                            <label for="punishment">Punishment</label>
+                            <select name="punishment">
+                                <option value="ban">Ban</option>
+                                <option value="mute">Mute</option>
+                                <option value="reject">Reject</option>
+                            </select>
 
-        <form method="POST", action="/dashboard/reports/" + input.reportId>
-            <fieldset>
-                <if(input.status === 'assigned')>
-                    <label for="punishment">Punishment</label>
-                    <select name="punishment">
-                        <option value="ban">Ban</option>
-                        <option value="mute">Mute</option>
-                        <option value="reject">Reject</option>
-                    </select>
+                            <label for="length">Length</label>
+                            <select name="length">
+                                <option value="3600000">1 hour</option>
+                                <option value="86400000">1 day</option>
+                                <option value="604800000">7 days</option>
+                                <option value="1209600000">14 days</option>
+                                <option value="2678400000">31 days</option>
+                                <option value="31536000000">365 days</option>
+                            </select>
 
-                    <label for="length">Length</label>
-                    <select name="length">
-                        <option value="3600000">1 hour</option>
-                        <option value="86400000">1 day</option>
-                        <option value="604800000">7 days</option>
-                        <option value="1209600000">14 days</option>
-                        <option value="2678400000">31 days</option>
-                        <option value="31536000000">365 days</option>
-                    </select>
+                            <input type="submit" class="button-primary" value="Submit Verdict">
+                        </if>
 
-                    <input type="submit" class="button-primary" value="Submit Verdict">
-                </if>
+                        <else-if(input.status === 'claimed')>
+                            <strong>Someone else is handling this report!</strong>
+                        </else-if>
 
-                <else-if(input.status === 'claimed')>
-                    <strong>Someone else is handling this report!</strong>
-                </else-if>
+                        <else-if(input.status === 'completed')>
+                            <strong>This report is completed.</strong>
+                        </else-if>
 
-                <else-if(input.status === 'completed')>
-                    <strong>This report is completed.</strong>
-                </else-if>
+                        <else>
+                            <input class="button-primary" type="submit" value="Handle Report">
+                        </else>
 
-                <else>
-                    <input class="button-primary" type="submit" value="Handle Report">
-                </else>
+                        <input type="hidden" name="_csrf" value=input.csrfToken>
+                    </fieldset>
+                </form>
+                <br />
+                <a href="/dashboard">Go Back to Dashboard</a>
+            </div>
 
-                <input type="hidden" name="_csrf" value=input.csrfToken>
-            </fieldset>
-        </form>
+            <div class="box two-thirds scroll-overflow-y">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <for|message| of=input.chatLog>
+                            <tr>
+                                <td style="width: 0;">${message.username}</td>
+                                <td>${message.message}</td>
+                            </tr>
+                        </for>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </body>
 </html>

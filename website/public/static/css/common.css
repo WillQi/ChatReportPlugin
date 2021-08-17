@@ -32,3 +32,23 @@ input {
 h1 {
     cursor: default;
 }
+
+.two-thirds {
+    width: 66%;
+}
+
+.one-third {
+    width: 33%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.scroll-overflow-y {
+    overflow-y: scroll;
+}
+
+.scroll-overflow-y::-webkit-scrollbar {
+    display: none;
+  }
