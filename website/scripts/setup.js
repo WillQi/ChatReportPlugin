@@ -1,6 +1,7 @@
 // Setup database tables
 require('dotenv').config();
 const { sqlConnection } = require('../src/utility/database');
+const usersModel = require('../src/models/users');
 
 // who can access the site
 const CREATE_USERS_TABLE = `CREATE TABLE IF NOT EXISTS users (
@@ -44,6 +45,17 @@ const CREATE_PUNISHMENTS_TABLE = `CREATE TABLE IF NOT EXISTS punishments (
     PRIMARY KEY(id) 
 );`;
 
+function generateRandomPassword(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuwxyz1234567890!@#$%^&*()';
+    const character = characters[Math.floor(Math.random() * characters.length)];
+
+    if (length === 1) {
+        return character;
+    } else {
+        return character + generateRandomPassword(length - 1);
+    }
+}
+
 (async function() {
     try {
         await sqlConnection.execute(CREATE_USERS_TABLE);
@@ -51,6 +63,11 @@ const CREATE_PUNISHMENTS_TABLE = `CREATE TABLE IF NOT EXISTS punishments (
         await sqlConnection.execute(CREATE_LOG_TABLE);
         await sqlConnection.execute(CREATE_PUNISHMENTS_TABLE);
         console.log('Successfully setup database tables!');
+
+        const password = generateRandomPassword(16);
+        await usersModel.createUser('admin', password, true);
+        console.log(`Your admin account credentials\n===\nUsername: admin\nPassword: ${password}`);
+
         process.exit();
     } catch (error) {
         console.error(error);
