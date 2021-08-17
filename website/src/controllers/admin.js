@@ -3,6 +3,7 @@ const csrf = require('../middleware/csrf');
 const { loggedIn, isAdmin } = require('../middleware/session');
 
 const managementView = require('../views/admin/users.marko').default;
+const createUser = require('../views/admin/createUser.marko').default;
 
 const usersModel = require('../models/users');
 
@@ -47,12 +48,62 @@ router.post('/admin/users', csrf, loggedIn, isAdmin, async function(request, res
 
 // Create a user form
 router.get('/admin/users/create', csrf, loggedIn, isAdmin, function(request, response) {
-    // TODO: User creation page
+    response.marko(createUser, {
+        csrfToken: request.csrfToken()
+    });
 });
 
 // Create user logic
-router.post('/admin/users/create', csrf, loggedIn, isAdmin, function(request, response) {
-    // TODO: User creation page
+router.post('/admin/users/create', csrf, loggedIn, isAdmin, async function(request, response) {
+    if (!request.body.username || !request.body.password) {
+        response.marko(createUser, {
+            csrfToken: request.csrfToken(),
+            status: 'error',
+            message: 'Please fill out the username and password'
+        });
+        return;
+    }
+
+    const { username, password } = request.body;
+    if (!usersModel.isValidUsername(username)) {
+        response.marko(createUser, {
+            csrfToken: request.csrfToken(),
+            status: 'error',
+            message: 'Usernames must be under 16 characters'
+        });
+        return;
+    }
+    if (!usersModel.isValidPassword(password)) {
+        response.marko(createUser, {
+            csrfToken: request.csrfToken(),
+            status: 'error',
+            message: 'Password is not long enough'
+        });
+        return;
+    }
+    
+    // Create user if it does not exist
+    try {
+        const user = await usersModel.getUserByUsername(username);
+        if (user) {
+            response.marko(createUser, {
+                csrfToken: request.csrfToken(),
+                status: 'error',
+                message: 'Username already exists'
+            });
+            return;
+        }
+
+        await usersModel.createUser(username, password);
+        response.marko(createUser, {
+            csrfToken: request.csrfToken(),
+            status: 'success',
+            message: 'Successfully created user!'
+        });
+    } catch (error) {
+        console.error(error);
+        response.sendStatus(500);
+    }
 });
 
 

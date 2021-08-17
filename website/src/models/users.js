@@ -58,8 +58,16 @@ class UsersModel {
         await sqlConnection.execute(CREATE_USER_STMT, [username, hash, isAdmin]);
     }
 
+    isValidUsername(username) {
+        return username.length > 0 && username.length <= 16;
+    }
+
+    isValidPassword(password) {
+        return password.length > 0;
+    }
+
     async deleteUser(id) {
-        await sqlConnection.emit(DELETE_USER_STMT, [id]);
+        await sqlConnection.execute(DELETE_USER_STMT, [id]);
     }
 
     async checkLogin(username, password) {

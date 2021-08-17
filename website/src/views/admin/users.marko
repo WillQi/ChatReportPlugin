@@ -9,7 +9,8 @@
     <body>
         <div class="columns">
             <div class="box full-width centered-text scroll-overflow-y">
-                <button class="button-primary" id="createUser">Create User</button>
+                <a class="float-left" href="/dashboard">Go Back to Dashboard</a>
+                <button class="button-primary float-right" id="createUser">Create User</button>
                 <table>
                     <thead>
                         <th>Username</th>
@@ -21,7 +22,12 @@
                                 <form action="/admin/users" method="POST">
                                     <td><label>${user.username}</label></td>
                                     <td class="float-right">
-                                        <input type="submit" class="button-primary" value="Delete" />
+                                        <if(user.isAdmin)>
+                                            <input type="submit" class="button-primary" value="Cannot Delete Admin" disabled />
+                                        </if>
+                                        <else>
+                                            <input type="submit" class="button-primary" value="Delete" />
+                                        </else>
                                     </td>
                                     <input type="hidden" name="userId" value=user.id>
                                     <input type="hidden" name="_csrf" value=input.csrfToken>

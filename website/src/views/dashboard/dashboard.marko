@@ -9,6 +9,9 @@
             <div class="box one-third">
                 <h1>Dashboard</h1>
                 <label>Welcome ${input.username}!</label>
+                <if(input.user.isAdmin)>
+                    <a href="/admin/users">User Management</a>
+                </if>
             </div>
             <div class="box two-thirds">
                 <table>
