@@ -35,5 +35,12 @@ module.exports = {
         } else {
             next();
         }
+    },
+    isAdmin: function(request, response, next) {
+        if (request.user.isAdmin) {
+            next();
+        } else {
+            response.redirect('/dashboard');
+        }
     }
 };

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ChatReport | User Management</title>
+        <include-html("../utils/header.html") />
+        <link rel="stylesheet" href="/static/css/users.css">
+        <script src="/static/js/users.js"></script>
+    </head>
+    <body>
+        <div class="columns">
+            <div class="box full-width centered-text scroll-overflow-y">
+                <button class="button-primary" id="createUser">Create User</button>
+                <table>
+                    <thead>
+                        <th>Username</th>
+                        <th id="deleteColumn" class="float-right">Delete</th>
+                    </thead>
+                    <tbody>
+                        <for|user| of=input.users>
+                            <tr>
+                                <form action="/admin/users" method="POST">
+                                    <td><label>${user.username}</label></td>
+                                    <td class="float-right">
+                                        <input type="submit" class="button-primary" value="Delete" />
+                                    </td>
+                                    <input type="hidden" name="userId" value=user.id>
+                                    <input type="hidden" name="_csrf" value=input.csrfToken>
+                                </form>
+                            </tr>
+                        </for>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </body>
+</html>

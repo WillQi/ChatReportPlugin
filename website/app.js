@@ -29,6 +29,7 @@ app.use(valid);
 app.use(require('./src/controllers/login'));
 app.use(require('./src/controllers/dashboard'));
 app.use(require('./src/controllers/server'));
+app.use(require('./src/controllers/admin'));
 app.use(require('./src/controllers/misc'));
 
 
