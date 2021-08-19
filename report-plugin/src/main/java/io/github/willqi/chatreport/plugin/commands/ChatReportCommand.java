@@ -42,10 +42,11 @@ public class ChatReportCommand implements CommandExecutor, Listener {
         if (player == null) {
             commandSender.sendMessage(TextUtils.formatMessage("ChatReport", "That player is not online", ChatColor.RED));
             return true;
-        }
-
-        if (this.chatLog.size() == 0) {
+        } else if (this.chatLog.size() == 0) {
             commandSender.sendMessage(TextUtils.formatMessage("ChatReport", "There are no messages recorded", ChatColor.RED));
+            return true;
+        } else if (player.equals(commandSender)) {
+            commandSender.sendMessage(TextUtils.formatMessage("ChatReport", "You cannot report yourself"));
             return true;
         }
 
